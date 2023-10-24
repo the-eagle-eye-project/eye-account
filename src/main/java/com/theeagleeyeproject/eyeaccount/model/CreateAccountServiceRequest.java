@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class EyeAccountServiceRequest {
+public class CreateAccountServiceRequest {
 
     @NotNull
     private String firstName;
