@@ -21,5 +21,4 @@ public class CreateAccountServiceRequest {
     @ValidCountryName
     private String countryOfRegistration;
 
-
 }
