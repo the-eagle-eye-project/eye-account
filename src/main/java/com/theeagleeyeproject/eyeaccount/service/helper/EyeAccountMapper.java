@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 public interface EyeAccountMapper {
 
     @Mapping(target = "accountId", expression = "java(java.util.UUID.randomUUID().toString())")
+    @Mapping(target = "accountType", constant = "CLASSIC")
     EyeAccountEntity createAccountServiceRequestToEyeAccountEntity(CreateAccountServiceRequest createAccountServiceRequest);
 
     @Mapping(target = "message", expression = "java(\"Please save the integration id, since it has to be used" +

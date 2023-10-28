@@ -1,5 +1,6 @@
 package com.theeagleeyeproject.eyeaccount.entity;
 
+import com.theeagleeyeproject.eyeaccount.model.AccountType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -9,6 +10,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 
@@ -32,6 +35,10 @@ public class EyeAccountEntity {
 
     @Field(name = "country_of_registration")
     private String countryOfRegistration;
+
+    @Enumerated(EnumType.STRING)
+    @Field(name = "account_type")
+    private AccountType accountType;
 
     @CreatedDate
     @Field(name = "record_created_timestamp")
