@@ -1,6 +1,8 @@
 package com.theeagleeyeproject.eyeaccount.service;
 
-import com.theeagleeyeproject.eyeaccount.EyeAccountRepository;
+import com.theeagleeyeproject.eaglewings.exception.BirdException;
+import com.theeagleeyeproject.eaglewings.exception.ExceptionCategory;
+import com.theeagleeyeproject.eyeaccount.dao.EyeAccountRepository;
 import com.theeagleeyeproject.eyeaccount.entity.EyeAccountEntity;
 import com.theeagleeyeproject.eyeaccount.model.CreateAccountServiceRequest;
 import com.theeagleeyeproject.eyeaccount.model.CreateAccountServiceResponse;
@@ -29,10 +31,8 @@ public class CreateAccountService {
 
                 // TODO: call a client to send a verification email to the consumer, so that the account can be activated.
             } else {
-                // TODO: create a proper ApplicationException class, that returns a proper response to the user.
-                System.out.println("Account already exists");
+                throw new BirdException(ExceptionCategory.CONFLICT, "The account already exists.");
             }
-
 
         }
         return null;

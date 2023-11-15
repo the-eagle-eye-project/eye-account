@@ -1,4 +1,4 @@
-package com.theeagleeyeproject.eyeaccount;
+package com.theeagleeyeproject.eyeaccount.dao;
 
 import com.theeagleeyeproject.eyeaccount.entity.EyeAccountEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
