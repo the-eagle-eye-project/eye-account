@@ -232,4 +232,12 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub The Eagle Eye Project Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/the-eagle-eye-project/eagle-wings</url>
+        </repository>
+    </distributionManagement>
+
 </project>
