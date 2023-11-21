@@ -29,7 +29,7 @@
     <servers>
         <server>
             <id>github</id>
-            <username>${env.USER_NAME}</username>
+            <username>${env.USER_NAMES}</username>
             <password>${env.ACCESS_TOKEN}</password>
         </server>
     </servers>
