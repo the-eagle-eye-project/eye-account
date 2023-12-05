@@ -40,6 +40,9 @@ public class EyeAccountEntity {
     @Field(name = "account_type")
     private AccountType accountType;
 
+    @Field(name = "company_name")
+    private String companyName;
+
     @CreatedDate
     @Field(name = "record_created_timestamp")
     private LocalDateTime recordCreatedTimestamp;
