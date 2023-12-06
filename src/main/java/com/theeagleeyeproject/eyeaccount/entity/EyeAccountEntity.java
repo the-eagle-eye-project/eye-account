@@ -14,6 +14,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -42,6 +43,9 @@ public class EyeAccountEntity {
 
     @Field(name = "company_name")
     private String companyName;
+
+    @Field(name = "applications")
+    private List<String> applications;
 
     @CreatedDate
     @Field(name = "record_created_timestamp")
