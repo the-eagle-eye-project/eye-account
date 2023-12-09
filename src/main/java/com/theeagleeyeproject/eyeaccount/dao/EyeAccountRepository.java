@@ -19,4 +19,12 @@ public interface EyeAccountRepository extends MongoRepository<EyeAccountEntity, 
      * @return an object of type {@link EyeAccountEntity}
      */
     EyeAccountEntity findByEmailAddress(String emailAddress);
+
+    /**
+     * Used to lookup account's stored information.
+     *
+     * @param accountId UUID generated when the account was initially created
+     * @return an object of type {@link EyeAccountEntity}
+     */
+    EyeAccountEntity findByAccountId(String accountId);
 }

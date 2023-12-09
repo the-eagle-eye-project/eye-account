@@ -2,6 +2,7 @@ package com.theeagleeyeproject.eyeaccount.service;
 
 import com.theeagleeyeproject.eaglewings.exception.BirdException;
 import com.theeagleeyeproject.eaglewings.exception.ExceptionCategory;
+import com.theeagleeyeproject.eyeaccount.dao.EyeAccountRepository;
 import com.theeagleeyeproject.eyeaccount.dao.EyeApplicationRepository;
 import com.theeagleeyeproject.eyeaccount.entity.EyeApplicationEntity;
 import com.theeagleeyeproject.eyeaccount.model.CreateApplicationServiceRequest;
@@ -22,6 +23,8 @@ public class CreateApplicationService {
 
     private final EyeApplicationRepository eyeApplicationRepository;
 
+    private final EyeAccountRepository eyeAccountRepository;
+
     public CreateApplicationServiceResponse create(CreateApplicationServiceRequest request) {
 
         EyeApplicationEntity existingEyeApplicationEntity = eyeApplicationRepository.findByApplicationName(request.getApplicationName());
@@ -35,7 +38,9 @@ public class CreateApplicationService {
 
             // TODO: Save the Application to the account, so that it's related.
 
-            
+//            if (eyeAccountRepository.findByAccountId())
+
+
             createApplicationServiceResponse = eyeApplicationMapper.eyeApplicationEntityToCreateApplicationServiceResponse(savedEyeApplicationEntity);
 
         } else {
