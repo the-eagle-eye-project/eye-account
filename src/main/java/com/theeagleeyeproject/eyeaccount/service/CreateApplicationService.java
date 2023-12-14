@@ -38,7 +38,9 @@ public class CreateApplicationService {
 
             // TODO: Save the Application to the account, so that it's related.
 
-//            if (eyeAccountRepository.findByAccountId())
+/*            if (eyeAccountRepository.findByAccountId()) {
+
+            }*/
 
 
             createApplicationServiceResponse = eyeApplicationMapper.eyeApplicationEntityToCreateApplicationServiceResponse(savedEyeApplicationEntity);
