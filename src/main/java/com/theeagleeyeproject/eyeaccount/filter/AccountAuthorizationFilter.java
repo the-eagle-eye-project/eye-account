@@ -3,6 +3,8 @@ package com.theeagleeyeproject.eyeaccount.filter;
 import com.theeagleeyeproject.eaglewings.exception.BirdException;
 import com.theeagleeyeproject.eaglewings.exception.ExceptionCategory;
 import com.theeagleeyeproject.eaglewings.utility.JwtUtil;
+import com.theeagleeyeproject.eyeaccount.dao.EyeAccountRepository;
+import com.theeagleeyeproject.eyeaccount.entity.EyeAccountEntity;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +36,11 @@ public class AccountAuthorizationFilter extends OncePerRequestFilter {
      */
     private final JwtUtil jwtUtil;
 
+    /**
+     * Used to verify the account id is registered and validated
+     */
+    private final EyeAccountRepository accountRepository;
+
 
     /**
      * Handles the authorization of any user performing request to the API.
@@ -62,13 +69,19 @@ public class AccountAuthorizationFilter extends OncePerRequestFilter {
         // Validate if the token is valid.
         if (jwtUtil.isTokenValid(jwt)) {
             userId = jwtUtil.extractClaims(jwt).get("sub").toString();
-            if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                Authentication authentication = getAuthentication(userId);
-                // Creates the Security Context from the JWT.
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            EyeAccountEntity accountEntity = accountRepository.findByAccountId(userId);
+            Authentication au = SecurityContextHolder.getContext().getAuthentication();
+            if (accountEntity != null) {
+                if (userId != null && (au == null || au.getPrincipal().equals("anonymousUser"))) {
+                    Authentication authentication = getAuthentication(userId);
+                    // Creates the Security Context from the JWT.
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } else {
+                throw new BirdException(ExceptionCategory.UNAUTHORIZED, "Account doesn't have authorization to consume this API.");
             }
         } else {
-            throw new BirdException(ExceptionCategory.UNAUTHORIZED, "The Application doesn't have authorization to consume this API.");
+            throw new BirdException(ExceptionCategory.UNAUTHORIZED, "Account doesn't have authorization to consume this API.");
         }
 
         filterChain.doFilter(request, response);
