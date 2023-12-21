@@ -3,10 +3,7 @@ package com.theeagleeyeproject.eyeaccount.entity;
 import com.theeagleeyeproject.eyeaccount.model.AccountType;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -15,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -22,8 +20,7 @@ import java.util.List;
 public class EyeAccountEntity {
 
     @Id
-    @Field(name = "account_id")
-    private String accountId;
+    private UUID accountId;
 
     @Field(name = "first_name")
     private String firstName;
@@ -62,5 +59,9 @@ public class EyeAccountEntity {
     @LastModifiedBy
     @Field(name = "record_updated_by")
     private String recordUpdatedBy;
+
+    @Version
+    @Field(name = "version")
+    private Long version;
 
 }

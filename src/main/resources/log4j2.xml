@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration name="Eye Registry" monitorInterval="30">
+    <Properties>
+        <Property name="BasePatternLayout">%highlight{${LOG_LEVEL_PATTERN:-%5p}}{FATAL=red blink, ERROR=red, WARN=yellow
+            bold, INFO=white, DEBUG=green bold, TRACE=blue bold} %style{%01.15t}{magenta} %style{%-30.40C{1.}.%M
+            %L}{cyan}
+        </Property>
+        <Property name="DefaultPatternLayout">%d{yyyy-MM-dd HH:mm:ss.SSS} ${BasePatternLayout} %X{transactionIdLogger}
+            -- %msg %n
+        </Property>
+    </Properties>
+    <Appenders>
+        <Console name="LoggingPattern" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${DefaultPatternLayout}"/>
+        </Console>
+        <Console name="TransactionPattern" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${DefaultPatternLayout}"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <!-- Application -->
+
+        <!-- Spring and Hibernate -->
+        <Logger name="org.hibernate" level="DEBUG"/>
+        <Logger name="org.springframework.security" level="DEBUG"/>
+        <Logger name="org.springframework.data" level="DEBUG"/>
+        <Logger name="org.springframework.web" level="DEBUG"/>
+        <Logger name="org.springframework.core" level="DEBUG"/>
+        <Logger name="org.springframework.boot" level="DEBUG"/>
+        <Logger name="org.springframework" level="DEBUG"/>
+        <Root>
+            <AppenderRef ref="LoggingPattern" level="DEBUG"/>
+        </Root>
+    </Loggers>
+</Configuration>

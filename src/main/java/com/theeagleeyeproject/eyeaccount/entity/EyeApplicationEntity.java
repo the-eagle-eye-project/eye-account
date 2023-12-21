@@ -10,6 +10,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,8 +18,7 @@ import java.util.List;
 public class EyeApplicationEntity {
 
     @Id
-    @Field(name = "application_id")
-    private String applicationId;
+    private UUID applicationId;
 
     @Field(name = "application_name")
     private String applicationName;

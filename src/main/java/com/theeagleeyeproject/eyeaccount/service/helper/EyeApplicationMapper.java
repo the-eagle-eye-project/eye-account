@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public interface EyeApplicationMapper {
 
 
-    @Mapping(target = "applicationId", expression = "java(java.util.UUID.randomUUID().toString())")
+    @Mapping(target = "applicationId", expression = "java(java.util.UUID.randomUUID())")
     @Mapping(source = "jobConfiguration", target = "jobConfigurationsEntity", qualifiedByName = "toJobConfigurationEntityList")
     EyeApplicationEntity createApplicationServiceRequestToEyeApplicationEntity(CreateApplicationServiceRequest request);
 

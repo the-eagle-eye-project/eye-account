@@ -1,7 +1,5 @@
 package com.theeagleeyeproject.eyeaccount.filter;
 
-import com.theeagleeyeproject.eaglewings.exception.BirdException;
-import com.theeagleeyeproject.eaglewings.exception.ExceptionCategory;
 import com.theeagleeyeproject.eaglewings.utility.JwtUtil;
 import com.theeagleeyeproject.eyeaccount.dao.EyeAccountRepository;
 import com.theeagleeyeproject.eyeaccount.entity.EyeAccountEntity;
@@ -10,16 +8,23 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * {@link AccountAuthorizationFilter} used to authorize a transaction.
@@ -29,6 +34,7 @@ import java.io.IOException;
 @Component
 @Order(1)
 @RequiredArgsConstructor
+@Log4j2
 public class AccountAuthorizationFilter extends OncePerRequestFilter {
 
     /**
@@ -53,38 +59,50 @@ public class AccountAuthorizationFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String jwt = getHeaderJWT(request);
+
+        // Validate if the token is valid.
+        if (jwtUtil.isTokenValid(jwt)) {
+            UUID userId = (UUID) jwtUtil.extractClaims(jwt).get("sub");
+            EyeAccountEntity accountEntity = accountRepository.findByAccountId(userId);
+            Authentication au = SecurityContextHolder.getContext().getAuthentication();
+
+            if (accountEntity != null && userId != null && (au == null || au.getPrincipal().equals("anonymousUser"))) {
+                Object jwtRole = jwtUtil.extractClaims(jwt).get("role");
+                Role role = null;
+                // Creates the role, if the role is present in the JWT.
+                if (jwtRole != null) {
+                    try {
+                        role = Role.valueOf(jwtRole.toString().toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        logger.warn("Unexpected role: " + jwtRole);
+                    }
+                }
+                Authentication authentication = getAuthentication(userId, createAuthorities(role));
+                // Creates the Security Context from the JWT.
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }
+        filterChain.doFilter(request, response);
+    }
+
+    /**
+     * Extracts the JWT from the header request
+     *
+     * @param request http servlet request
+     * @return a JWT of type {@link String}
+     */
+    private String getHeaderJWT(HttpServletRequest request) {
         ContentCachingRequestWrapper contentCachingRequestWrapper = new ContentCachingRequestWrapper(request);
         String authorizationHeader = contentCachingRequestWrapper.getHeader(HttpHeaders.AUTHORIZATION);
 
-        String jwt;
-        String userId;
+        String jwt = null;
 
         // Extract the token from the Bearer word.
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
-        } else {
-            throw new BirdException(ExceptionCategory.UNAUTHORIZED, "The Application doesn't have authorization to consume this API.");
         }
-
-        // Validate if the token is valid.
-        if (jwtUtil.isTokenValid(jwt)) {
-            userId = jwtUtil.extractClaims(jwt).get("sub").toString();
-            EyeAccountEntity accountEntity = accountRepository.findByAccountId(userId);
-            Authentication au = SecurityContextHolder.getContext().getAuthentication();
-            if (accountEntity != null) {
-                if (userId != null && (au == null || au.getPrincipal().equals("anonymousUser"))) {
-                    Authentication authentication = getAuthentication(userId);
-                    // Creates the Security Context from the JWT.
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-            } else {
-                throw new BirdException(ExceptionCategory.UNAUTHORIZED, "Account doesn't have authorization to consume this API.");
-            }
-        } else {
-            throw new BirdException(ExceptionCategory.UNAUTHORIZED, "Account doesn't have authorization to consume this API.");
-        }
-
-        filterChain.doFilter(request, response);
+        return jwt;
     }
 
     /**
@@ -94,7 +112,23 @@ public class AccountAuthorizationFilter extends OncePerRequestFilter {
      * @param userId UUID of the user making a request to the API
      * @return an object of type {@link Authentication}
      */
-    private Authentication getAuthentication(String userId) {
-        return new UsernamePasswordAuthenticationToken(userId, null, null);
+    private Authentication getAuthentication(UUID userId, Collection<GrantedAuthority> roles) {
+        return new UsernamePasswordAuthenticationToken(userId, null, roles);
+    }
+
+    /**
+     * Method used to set roles in the Authorities
+     *
+     * @param role user's stored role in the database
+     * @return a Collection of GrantedAuthority
+     */
+    private Collection<GrantedAuthority> createAuthorities(Role role) {
+        // If the user doesn't have any user, passed from the JWT Authorization Filter, then it will assign a DEFAULT role.
+        if (role == null) {
+            role = Role.DEFAULT;
+        }
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(role.toString()));
+        return authorities;
     }
 }
