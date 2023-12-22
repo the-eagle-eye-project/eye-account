@@ -41,7 +41,7 @@
         <dependency>
             <groupId>com.theeagleeyeproject</groupId>
             <artifactId>eagle-wings</artifactId>
-            <version>0.0.3</version>
+            <version>0.0.7</version>
         </dependency>
 
         <!-- Spring -->

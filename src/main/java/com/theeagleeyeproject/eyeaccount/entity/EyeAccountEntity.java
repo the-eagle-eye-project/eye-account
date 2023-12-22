@@ -9,10 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -20,7 +18,7 @@ import java.util.UUID;
 public class EyeAccountEntity {
 
     @Id
-    private UUID accountId;
+    private String id;
 
     @Field(name = "first_name")
     private String firstName;

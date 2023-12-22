@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface EyeAccountMapper {
 
-    @Mapping(target = "accountId", expression = "java(java.util.UUID.randomUUID())")
+    @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID().toString())")
     @Mapping(target = "accountType", constant = "CLASSIC")
     EyeAccountEntity createAccountServiceRequestToEyeAccountEntity(CreateAccountServiceRequest createAccountServiceRequest);
 

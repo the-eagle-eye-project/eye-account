@@ -4,15 +4,13 @@ import com.theeagleeyeproject.eyeaccount.entity.EyeApplicationEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.UUID;
-
 /**
  * {@link EyeApplicationRepository} repository used to access the registered application data from the database.
  *
  * @author johnmartinez
  */
 @Repository
-public interface EyeApplicationRepository extends MongoRepository<EyeApplicationEntity, UUID> {
+public interface EyeApplicationRepository extends MongoRepository<EyeApplicationEntity, String> {
 
     /**
      * Used to find the registered applications by application name.

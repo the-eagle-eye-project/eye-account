@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 /**
  * {@link CreateAccountService} used to orchestrate consumer's request throughout the creation of a new application.
@@ -33,32 +33,32 @@ public class CreateApplicationService {
 
     public CreateApplicationServiceResponse create(CreateApplicationServiceRequest request) {
 
-        EyeApplicationEntity existingEyeApplicationEntity = eyeApplicationRepository.findByApplicationName(request.getApplicationName());
         CreateApplicationServiceResponse createApplicationServiceResponse;
 
-        if (existingEyeApplicationEntity == null) {
+        if (eyeApplicationRepository.findByApplicationName(request.getApplicationName()) == null) {
             EyeApplicationMapper eyeApplicationMapper = Mappers.getMapper(EyeApplicationMapper.class);
             EyeApplicationEntity eyeApplicationEntity = eyeApplicationMapper.createApplicationServiceRequestToEyeApplicationEntity(request);
             EyeApplicationEntity savedEyeApplicationEntity = null;
 
 
             // Save the Application to the account, so that it's related.
-            UUID accountId = WebSecurityConfig.getPrincipal();
+            String accountId = WebSecurityConfig.getPrincipal();
             if (accountId != null) {
-                EyeAccountEntity accountEntity = eyeAccountRepository.findByAccountId(accountId);
-                List<String> accountApplications = accountEntity.getApplications();
-                String newApplications = String.valueOf(eyeApplicationEntity.getApplicationId());
-
+                Optional<EyeAccountEntity> accountEntity = eyeAccountRepository.findById(accountId);
                 // Verify if there are available applications related to the accounts. If there are non, then create a
                 // new collection under the account.
-                if (accountApplications == null) {
-                    accountEntity.setApplications(Collections.singletonList(newApplications));
-                } else {
-                    accountApplications.add(newApplications);
-                    accountEntity.setApplications(accountApplications);
+                if (accountEntity.isPresent()) {
+                    EyeAccountEntity eyeAccountEntity = accountEntity.get();
+                    List<String> applications = eyeAccountEntity.getApplications();
+                    if (applications == null) {
+                        List<String> newApplications = Collections.singletonList(eyeApplicationEntity.getId());
+                        eyeAccountEntity.setApplications(newApplications);
+                    } else {
+                        eyeAccountEntity.getApplications().add(eyeApplicationEntity.getId());
+                    }
+                    savedEyeApplicationEntity = eyeApplicationRepository.save(eyeApplicationEntity);
+                    eyeAccountRepository.save(eyeAccountEntity);
                 }
-                savedEyeApplicationEntity = eyeApplicationRepository.save(eyeApplicationEntity);
-                eyeAccountRepository.save(accountEntity); // TODO: fix this update, which is throwing an duplicate key exception.
             }
 
             createApplicationServiceResponse = eyeApplicationMapper.eyeApplicationEntityToCreateApplicationServiceResponse(savedEyeApplicationEntity);

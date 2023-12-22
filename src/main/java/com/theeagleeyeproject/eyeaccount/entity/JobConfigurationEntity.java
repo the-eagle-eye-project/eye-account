@@ -27,6 +27,7 @@ public class JobConfigurationEntity {
     @Field(name = "job_type")
     private JobType jobType;
 
+    // TODO: this field it's not been propagated to the database from the request.
     @Field(name = "pre_process_jobs")
     private List<String> preProcessJobs;
 

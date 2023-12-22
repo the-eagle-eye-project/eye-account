@@ -9,8 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.util.UUID;
-
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig {
@@ -31,11 +29,11 @@ public class WebSecurityConfig {
      *
      * @return userId/principal
      */
-    public static UUID getPrincipal() {
+    public static String getPrincipal() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UUID principal = null;
+        String principal = null;
         if (authentication != null) {
-            principal = (UUID) authentication.getPrincipal();
+            principal = authentication.getPrincipal().toString();
         }
         return principal;
     }

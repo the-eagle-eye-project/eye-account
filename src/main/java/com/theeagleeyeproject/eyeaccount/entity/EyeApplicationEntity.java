@@ -3,14 +3,13 @@ package com.theeagleeyeproject.eyeaccount.entity;
 import com.theeagleeyeproject.eyeaccount.model.ApplicationType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Id;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,7 +17,7 @@ import java.util.UUID;
 public class EyeApplicationEntity {
 
     @Id
-    private UUID applicationId;
+    private String id;
 
     @Field(name = "application_name")
     private String applicationName;

@@ -1,9 +1,13 @@
 package com.theeagleeyeproject.eyeaccount.filter;
 
+import com.theeagleeyeproject.eaglewings.controller.BirdErrorController;
+import com.theeagleeyeproject.eaglewings.exception.BirdException;
+import com.theeagleeyeproject.eaglewings.exception.ExceptionCategory;
 import com.theeagleeyeproject.eaglewings.utility.JwtUtil;
 import com.theeagleeyeproject.eyeaccount.dao.EyeAccountRepository;
 import com.theeagleeyeproject.eyeaccount.entity.EyeAccountEntity;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 /**
  * {@link AccountAuthorizationFilter} used to authorize a transaction.
@@ -59,31 +63,40 @@ public class AccountAuthorizationFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String jwt = getHeaderJWT(request);
 
-        // Validate if the token is valid.
-        if (jwtUtil.isTokenValid(jwt)) {
-            UUID userId = (UUID) jwtUtil.extractClaims(jwt).get("sub");
-            EyeAccountEntity accountEntity = accountRepository.findByAccountId(userId);
-            Authentication au = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            String jwt = getHeaderJWT(request);
 
-            if (accountEntity != null && userId != null && (au == null || au.getPrincipal().equals("anonymousUser"))) {
-                Object jwtRole = jwtUtil.extractClaims(jwt).get("role");
-                Role role = null;
-                // Creates the role, if the role is present in the JWT.
-                if (jwtRole != null) {
-                    try {
-                        role = Role.valueOf(jwtRole.toString().toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        logger.warn("Unexpected role: " + jwtRole);
+            // Validate if the token is valid.
+            if (jwtUtil.isTokenValid(jwt)) {
+                String userId = jwtUtil.extractClaims(jwt).get("sub").toString();
+                Optional<EyeAccountEntity> accountEntity = accountRepository.findById(userId);
+                Authentication au = SecurityContextHolder.getContext().getAuthentication();
+
+                if (accountEntity.isPresent() && (au == null || au.getPrincipal().equals("anonymousUser"))) {
+                    Object jwtRole = jwtUtil.extractClaims(jwt).get("role");
+                    Role role = null;
+                    // Creates the role, if the role is present in the JWT.
+                    if (jwtRole != null) {
+                        try {
+                            role = Role.valueOf(jwtRole.toString().toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            logger.warn("Unexpected role: " + jwtRole);
+                        }
                     }
+                    Authentication authentication = getAuthentication(userId, createAuthorities(role));
+                    // Creates the Security Context from the JWT.
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+
                 }
-                Authentication authentication = getAuthentication(userId, createAuthorities(role));
-                // Creates the Security Context from the JWT.
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                throw new BirdException(ExceptionCategory.FORBIDDEN, "The access to this resource is forbidden with the current credentials.");
             }
+            filterChain.doFilter(request, response);
+        } catch (BirdException e) {
+            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
+            request.getRequestDispatcher(BirdErrorController.EXCEPTION_MAPPING).forward(request, response);
         }
-        filterChain.doFilter(request, response);
     }
 
     /**
@@ -112,7 +125,7 @@ public class AccountAuthorizationFilter extends OncePerRequestFilter {
      * @param userId UUID of the user making a request to the API
      * @return an object of type {@link Authentication}
      */
-    private Authentication getAuthentication(UUID userId, Collection<GrantedAuthority> roles) {
+    private Authentication getAuthentication(String userId, Collection<GrantedAuthority> roles) {
         return new UsernamePasswordAuthenticationToken(userId, null, roles);
     }
 

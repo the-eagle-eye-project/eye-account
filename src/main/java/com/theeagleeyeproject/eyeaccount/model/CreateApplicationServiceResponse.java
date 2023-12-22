@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class CreateApplicationServiceResponse {
 
-    private String applicationId;
+    private String id;
 
     private String message;
 }
