@@ -4,6 +4,7 @@ import com.theeagleeyeproject.eaglewings.controller.BirdErrorController;
 import com.theeagleeyeproject.eaglewings.exception.BirdException;
 import com.theeagleeyeproject.eaglewings.exception.ExceptionCategory;
 import com.theeagleeyeproject.eaglewings.utility.JwtUtil;
+import com.theeagleeyeproject.eyeaccount.controller.CreateAccountController;
 import com.theeagleeyeproject.eyeaccount.dao.EyeAccountRepository;
 import com.theeagleeyeproject.eyeaccount.entity.EyeAccountEntity;
 import jakarta.servlet.FilterChain;
@@ -64,33 +65,37 @@ public class AccountAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        String requestURI = request.getRequestURI();
+
         try {
-            String jwt = getHeaderJWT(request);
+            if (!CreateAccountController.ACCOUNT_RESOURCE_URL.equals(requestURI)) {
+                String jwt = getHeaderJWT(request);
 
-            // Validate if the token is valid.
-            if (jwtUtil.isTokenValid(jwt)) {
-                String userId = jwtUtil.extractClaims(jwt).get("sub").toString();
-                Optional<EyeAccountEntity> accountEntity = accountRepository.findById(userId);
-                Authentication au = SecurityContextHolder.getContext().getAuthentication();
+                // Validate if the token is valid.
+                if (jwtUtil.isTokenValid(jwt)) {
+                    String userId = jwtUtil.extractClaims(jwt).get("sub").toString();
+                    Optional<EyeAccountEntity> accountEntity = accountRepository.findById(userId);
+                    Authentication au = SecurityContextHolder.getContext().getAuthentication();
 
-                if (accountEntity.isPresent() && (au == null || au.getPrincipal().equals("anonymousUser"))) {
-                    Object jwtRole = jwtUtil.extractClaims(jwt).get("role");
-                    Role role = null;
-                    // Creates the role, if the role is present in the JWT.
-                    if (jwtRole != null) {
-                        try {
-                            role = Role.valueOf(jwtRole.toString().toUpperCase());
-                        } catch (IllegalArgumentException e) {
-                            logger.warn("Unexpected role: " + jwtRole);
+                    if (accountEntity.isPresent() && (au == null || au.getPrincipal().equals("anonymousUser"))) {
+                        Object jwtRole = jwtUtil.extractClaims(jwt).get("role");
+                        Role role = null;
+                        // Creates the role, if the role is present in the JWT.
+                        if (jwtRole != null) {
+                            try {
+                                role = Role.valueOf(jwtRole.toString().toUpperCase());
+                            } catch (IllegalArgumentException e) {
+                                logger.warn("Unexpected role: " + jwtRole);
+                            }
                         }
-                    }
-                    Authentication authentication = getAuthentication(userId, createAuthorities(role));
-                    // Creates the Security Context from the JWT.
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                        Authentication authentication = getAuthentication(userId, createAuthorities(role));
+                        // Creates the Security Context from the JWT.
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
 
+                    }
+                } else {
+                    throw new BirdException(ExceptionCategory.FORBIDDEN, "The access to this resource is forbidden with the current credentials.");
                 }
-            } else {
-                throw new BirdException(ExceptionCategory.FORBIDDEN, "The access to this resource is forbidden with the current credentials.");
             }
             filterChain.doFilter(request, response);
         } catch (BirdException e) {

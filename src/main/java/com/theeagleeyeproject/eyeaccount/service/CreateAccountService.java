@@ -2,8 +2,10 @@ package com.theeagleeyeproject.eyeaccount.service;
 
 import com.theeagleeyeproject.eaglewings.exception.BirdException;
 import com.theeagleeyeproject.eaglewings.exception.ExceptionCategory;
+import com.theeagleeyeproject.eaglewings.utility.JwtUtil;
 import com.theeagleeyeproject.eyeaccount.dao.EyeAccountRepository;
 import com.theeagleeyeproject.eyeaccount.entity.EyeAccountEntity;
+import com.theeagleeyeproject.eyeaccount.filter.Role;
 import com.theeagleeyeproject.eyeaccount.model.CreateAccountServiceRequest;
 import com.theeagleeyeproject.eyeaccount.model.CreateAccountServiceResponse;
 import com.theeagleeyeproject.eyeaccount.service.helper.EyeAccountMapper;
@@ -11,13 +13,20 @@ import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class CreateAccountService {
 
     private final EyeAccountRepository eyeAccountRepository;
 
+    private final JwtUtil jwtUtil;
+
     public CreateAccountServiceResponse create(CreateAccountServiceRequest request) {
+
+        CreateAccountServiceResponse serviceResponse = null;
 
         if (request != null) {
             // Query the collection to verify that the account been registered doesn't already exist.
@@ -27,7 +36,16 @@ public class CreateAccountService {
                 EyeAccountEntity eyeAccountEntity = eyeAccountMapper.createAccountServiceRequestToEyeAccountEntity(request);
 
                 // Save the record into the database.
-                eyeAccountRepository.save(eyeAccountEntity);
+                EyeAccountEntity savedAccount = eyeAccountRepository.save(eyeAccountEntity);
+
+                // TODO: Should be moved to the JWT util module.
+                Map<String, Object> claims = new HashMap<>();
+                claims.put("role", Role.USER.toString());
+
+                String jwt = jwtUtil.generateToken(savedAccount.getId(), claims);
+                serviceResponse = eyeAccountMapper.eyeAccountEntityToCreateAccountServiceResponse(savedAccount);
+                serviceResponse.setJwt(jwt);
+
 
                 // TODO: call a client to send a verification email to the consumer, so that the account can be activated.
             } else {
@@ -35,6 +53,6 @@ public class CreateAccountService {
             }
 
         }
-        return null;
+        return serviceResponse;
     }
 }

@@ -7,5 +7,7 @@ public class CreateAccountServiceResponse {
 
     private String id;
 
+    private String jwt;
+
     private String message;
 }
