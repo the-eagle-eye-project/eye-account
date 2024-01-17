@@ -72,36 +72,45 @@ public class AccountAuthorizationFilter extends OncePerRequestFilter {
             if (!CreateAccountController.ACCOUNT_RESOURCE_URL.equals(requestURI)) {
                 String jwt = getHeaderJWT(request);
 
-                // Validate if the token is valid.
-                if (jwtUtil.isTokenValid(jwt)) {
-                    String userId = jwtUtil.extractClaims(jwt).get("sub").toString();
-                    Optional<EyeAccountEntity> accountEntity = accountRepository.findById(userId);
-                    Authentication au = SecurityContextHolder.getContext().getAuthentication();
-
-                    if (accountEntity.isPresent() && (au == null || au.getPrincipal().equals("anonymousUser"))) {
-                        Object jwtRole = jwtUtil.extractClaims(jwt).get("role");
-                        Role role = null;
-                        // Creates the role, if the role is present in the JWT.
-                        if (jwtRole != null) {
-                            try {
-                                role = Role.valueOf(jwtRole.toString().toUpperCase());
-                            } catch (IllegalArgumentException e) {
-                                logger.warn("Unexpected role: " + jwtRole);
-                            }
-                        }
-                        Authentication authentication = getAuthentication(userId, createAuthorities(role));
-                        // Creates the Security Context from the JWT.
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                    }
-                } else {
-                    throw new BirdException(ExceptionCategory.FORBIDDEN, "The access to this resource is forbidden with the current credentials.");
-                }
+                createSecurityContext(jwt);
             }
             filterChain.doFilter(request, response);
         } catch (BirdException e) {
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
             request.getRequestDispatcher(BirdErrorController.EXCEPTION_MAPPING).forward(request, response);
+        }
+    }
+
+    /**
+     * Create the transaction security context, for further usage.
+     *
+     * @param jwt request auth token
+     */
+    private void createSecurityContext(String jwt) {
+        // Validate if the token is valid.
+        if (jwtUtil.isTokenValid(jwt)) {
+            String userId = jwtUtil.extractClaims(jwt).get("sub").toString();
+            Optional<EyeAccountEntity> accountEntity = accountRepository.findById(userId);
+            Authentication existingAuth = SecurityContextHolder.getContext().getAuthentication();
+
+            if (accountEntity.isPresent() && (existingAuth == null || existingAuth.getPrincipal().equals("anonymousUser"))) {
+                Object jwtRole = jwtUtil.extractClaims(jwt).get("role");
+                Role role = null;
+                // Creates the role, if the role is present in the JWT.
+                if (jwtRole != null) {
+                    try {
+                        role = Role.valueOf(jwtRole.toString().toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        logger.warn("Unexpected role: " + jwtRole);
+                    }
+                }
+                Authentication authentication = getAuthentication(userId, createAuthorities(role));
+                // Creates the Security Context from the JWT.
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            }
+        } else {
+            throw new BirdException(ExceptionCategory.FORBIDDEN, "The access to this resource is forbidden with the current credentials.");
         }
     }
 
