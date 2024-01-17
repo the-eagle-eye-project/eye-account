@@ -2,19 +2,16 @@ package com.theeagleeyeproject.eyeaccount.service;
 
 import com.theeagleeyeproject.eaglewings.exception.BirdException;
 import com.theeagleeyeproject.eaglewings.exception.ExceptionCategory;
+import com.theeagleeyeproject.eaglewings.security.Role;
 import com.theeagleeyeproject.eaglewings.utility.JwtUtil;
 import com.theeagleeyeproject.eyeaccount.dao.EyeAccountRepository;
 import com.theeagleeyeproject.eyeaccount.entity.EyeAccountEntity;
-import com.theeagleeyeproject.eyeaccount.filter.Role;
 import com.theeagleeyeproject.eyeaccount.model.CreateAccountServiceRequest;
 import com.theeagleeyeproject.eyeaccount.model.CreateAccountServiceResponse;
 import com.theeagleeyeproject.eyeaccount.service.helper.EyeAccountMapper;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -38,11 +35,7 @@ public class CreateAccountService {
                 // Save the record into the database.
                 EyeAccountEntity savedAccount = eyeAccountRepository.save(eyeAccountEntity);
 
-                // TODO: Should be moved to the JWT util module.
-                Map<String, Object> claims = new HashMap<>();
-                claims.put("role", Role.USER.toString());
-
-                String jwt = jwtUtil.generateToken(savedAccount.getId(), claims);
+                String jwt = jwtUtil.generateToken(savedAccount.getId(), Role.USER);
                 serviceResponse = eyeAccountMapper.eyeAccountEntityToCreateAccountServiceResponse(savedAccount);
                 serviceResponse.setJwt(jwt);
 

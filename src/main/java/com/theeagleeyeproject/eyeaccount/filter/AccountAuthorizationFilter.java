@@ -3,6 +3,7 @@ package com.theeagleeyeproject.eyeaccount.filter;
 import com.theeagleeyeproject.eaglewings.controller.BirdErrorController;
 import com.theeagleeyeproject.eaglewings.exception.BirdException;
 import com.theeagleeyeproject.eaglewings.exception.ExceptionCategory;
+import com.theeagleeyeproject.eaglewings.security.Role;
 import com.theeagleeyeproject.eaglewings.utility.JwtUtil;
 import com.theeagleeyeproject.eyeaccount.controller.CreateAccountController;
 import com.theeagleeyeproject.eyeaccount.dao.EyeAccountRepository;

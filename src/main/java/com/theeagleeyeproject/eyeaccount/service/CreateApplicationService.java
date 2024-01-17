@@ -37,7 +37,7 @@ public class CreateApplicationService {
 
         if (eyeApplicationRepository.findByApplicationName(request.getApplicationName()) == null) {
             EyeApplicationMapper eyeApplicationMapper = Mappers.getMapper(EyeApplicationMapper.class);
-            EyeApplicationEntity eyeApplicationEntity = eyeApplicationMapper.createApplicationServiceRequestToEyeApplicationEntity(request);
+
             EyeApplicationEntity savedEyeApplicationEntity = null;
 
 
@@ -50,6 +50,7 @@ public class CreateApplicationService {
                 if (accountEntity.isPresent()) {
                     EyeAccountEntity eyeAccountEntity = accountEntity.get();
                     List<String> applications = eyeAccountEntity.getApplications();
+                    EyeApplicationEntity eyeApplicationEntity = eyeApplicationMapper.createApplicationServiceRequestToEyeApplicationEntity(request);
                     if (applications == null) {
                         List<String> newApplications = Collections.singletonList(eyeApplicationEntity.getId());
                         eyeAccountEntity.setApplications(newApplications);
