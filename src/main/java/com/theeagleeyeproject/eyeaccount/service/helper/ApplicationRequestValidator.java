@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 
 /**
  * {@link ApplicationRequestValidator} is used to validate the incoming user request to create new applications into the system.
+ * <p>
+ * TODO: Should this validator be a Annotation that is added at the request object? Should the annotation be generic?
+ *          Passing the validator class, the call to validate doesn't need to happen at the service, but at the request.
  *
  * @author johnmartinez
  */
