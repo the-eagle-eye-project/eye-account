@@ -4,6 +4,8 @@ import com.theeagleeyeproject.eyeaccount.entity.EyeApplicationEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * {@link EyeApplicationRepository} repository used to access the registered application data from the database.
  *
@@ -18,5 +20,5 @@ public interface EyeApplicationRepository extends MongoRepository<EyeApplication
      * @param applicationName name of the application
      * @return an entity of type {@link EyeApplicationEntity}
      */
-    EyeApplicationEntity findByApplicationName(String applicationName);
+    List<EyeApplicationEntity> findByApplicationName(String applicationName);
 }

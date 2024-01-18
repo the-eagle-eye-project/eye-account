@@ -27,10 +27,22 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CreateApplicationService {
 
+    /**
+     * Application repository, used to access and perform CRUD ops into the application collection.
+     */
     private final EyeApplicationRepository eyeApplicationRepository;
 
+    /**
+     * Account repository, used to access and read the existing accounts stored in the accounts collection.
+     */
     private final EyeAccountRepository eyeAccountRepository;
 
+    /**
+     * Used to handle the user's request to register or create a new application into the system.
+     *
+     * @param request user's request of type {@link CreateApplicationServiceRequest}
+     * @return an object of type {@link CreateApplicationServiceResponse}
+     */
     public CreateApplicationServiceResponse create(CreateApplicationServiceRequest request) {
 
         CreateApplicationServiceResponse createApplicationServiceResponse;
@@ -40,11 +52,11 @@ public class CreateApplicationService {
 
             EyeApplicationEntity savedEyeApplicationEntity = null;
 
-
             // Save the Application to the account, so that it's related.
             String accountId = WebSecurityConfig.getPrincipal();
             if (accountId != null) {
                 Optional<EyeAccountEntity> accountEntity = eyeAccountRepository.findById(accountId);
+
                 // Verify if there are available applications related to the accounts. If there are non, then create a
                 // new collection under the account.
                 if (accountEntity.isPresent()) {
