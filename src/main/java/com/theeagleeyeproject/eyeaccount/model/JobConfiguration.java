@@ -27,12 +27,12 @@ public class JobConfiguration {
     private JobType jobType;
 
     /**
-     * Creates a monitoring dependency between different jobs inside the same application.
+     * Creates a monitoring dependency between different jobs within the same application.
      * </p>
      * If the Application's jobs should be monitored in a specific order, then each should
      * have the dependencies respective to the order.
      */
-    private List<String> preProcessedJobs;
+    private List<String> preProcessedJobsName;
 
     /**
      * Transactions per second, that is expected by the job, otherwise it would create an alert.

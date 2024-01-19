@@ -81,4 +81,29 @@ class ApplicationRequestValidatorTest {
         Assertions.assertThrows(BirdException.class, () -> validator.validate(applicationServiceRequest),
                 "The request validator is failing at the compare of the existing applications and requested application name.");
     }
+
+
+/*    @Test
+    void validate_allThePreProcessedJobNames_arePresent() {
+
+    }
+
+    private CreateApplicationServiceRequest createValidRequest() {
+        // Mocks the request object.
+        String sampleApplicationName = "AppSample";
+        CreateApplicationServiceRequest applicationServiceRequest = new CreateApplicationServiceRequest();
+        applicationServiceRequest.setApplicationName(sampleApplicationName);
+
+        // Mocks the Account stored in the database.
+        EyeAccountEntity accountEntity = new EyeAccountEntity();
+        accountEntity.setApplications(List.of("appId1", "appId2", "appId3"));
+        when(accountRepository.findById(any())).thenReturn(Optional.of(accountEntity));
+
+        // Mocks the retrieve of some Application stored in the database that matched the name in the request.
+        EyeApplicationEntity applicationEntityId1 = new EyeApplicationEntity();
+        applicationEntityId1.setId("appId5");
+        EyeApplicationEntity applicationEntityId4 = new EyeApplicationEntity();
+        applicationEntityId4.setId("appId4");
+
+    }*/
 }
