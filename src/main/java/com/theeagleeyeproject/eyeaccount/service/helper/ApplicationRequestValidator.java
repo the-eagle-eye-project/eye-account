@@ -100,15 +100,15 @@ public class ApplicationRequestValidator implements BaseServiceValidator<CreateA
      * - It to validate that the pre-processed job ids are actually present in the application request.
      * - Validates that there are no duplicated job in the configuration
      *
-     * @param jobConfiguration configuration object that contains the details of a specific job inside an application.
+     * @param jobConfigurations configuration object that contains the details of a specific job inside an application.
      */
-    private void validateJobConfiguration(List<JobConfiguration> jobConfiguration) {
+    private void validateJobConfiguration(List<JobConfiguration> jobConfigurations) {
 
         // TODO: NEEDS TO BE TESTED
         //      Needs to be moved to a BaseAccountValidator abstract class, so that it can be re-used when adding or editing jobs.
 
         // Verifies that the name of each job are not duplicate within the same application.
-        boolean doesHaveRepeatedJobNames = jobConfiguration.stream()
+        boolean doesHaveRepeatedJobNames = jobConfigurations.stream()
                 .collect(Collectors.groupingBy(JobConfiguration::getJobName))
                 .values()
                 .stream()
@@ -120,12 +120,26 @@ public class ApplicationRequestValidator implements BaseServiceValidator<CreateA
         }
 
         // Validate the pre-processed job ID is valid and exists within the Application's jobs.
-        List<String> jobNames = jobConfiguration.stream()
+        List<String> jobNames = jobConfigurations.stream()
                 .map(JobConfiguration::getJobName)
                 .toList();
 
+        // TODO: finish this logic
+        for (JobConfiguration jobConfiguration : jobConfigurations) {
+            List<String> preProcessedJobs = jobConfiguration.getPreProcessedJobsName();
+            boolean allJobsFound = false;
+            for (String preProcessedJob : preProcessedJobs) {
+                for (String jobName : jobNames) {
+                    if (preProcessedJob.equals(jobName)) {
+                        break;
+                    }
+                }
+            }
+
+        }
+
         // Do the comparison
-        if (!jobConfiguration.stream().allMatch(jobNames::contains)) {
+        if (!jobConfigurations.stream().allMatch(jobNames::contains)) {
             throw new BirdException(ExceptionCategory.VALIDATION_ERROR, "One or more job/s in the pre processed list doesn't have a parent.");
         }
 
