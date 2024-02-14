@@ -21,13 +21,13 @@
         <!-- Application -->
 
         <!-- Spring and Hibernate -->
-        <Logger name="org.hibernate" level="DEBUG"/>
-        <Logger name="org.springframework.security" level="DEBUG"/>
-        <Logger name="org.springframework.data" level="DEBUG"/>
-        <Logger name="org.springframework.web" level="DEBUG"/>
-        <Logger name="org.springframework.core" level="DEBUG"/>
-        <Logger name="org.springframework.boot" level="DEBUG"/>
-        <Logger name="org.springframework" level="DEBUG"/>
+        <Logger name="org.hibernate" level="OFF"/>
+        <Logger name="org.springframework.security" level="OFF"/>
+        <Logger name="org.springframework.data" level="OFF"/>
+        <Logger name="org.springframework.web" level="OFF"/>
+        <Logger name="org.springframework.core" level="OFF"/>
+        <Logger name="org.springframework.boot" level="OFF"/>
+        <Logger name="org.springframework" level="OFF"/>
         <Root>
             <AppenderRef ref="LoggingPattern" level="DEBUG"/>
         </Root>

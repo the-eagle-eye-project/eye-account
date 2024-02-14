@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/eye/v1/application")
+@RequestMapping(CreateApplicationController.APPLICATION_RESOURCE_URL)
 @RequiredArgsConstructor
 public class CreateApplicationController extends BaseController {
+
+    public static final String APPLICATION_RESOURCE_URL = "/eye/v1/applications";
 
     private final CreateApplicationService createApplicationService;
 
