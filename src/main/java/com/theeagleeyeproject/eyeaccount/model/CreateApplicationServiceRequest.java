@@ -1,9 +1,10 @@
 package com.theeagleeyeproject.eyeaccount.model;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -16,5 +17,7 @@ public class CreateApplicationServiceRequest {
     private ApplicationType applicationType;
 
     @Valid
+    @NotNull
+    @Size(min = 1, message = "Job Configuration is null")
     private List<JobConfiguration> jobConfiguration;
 }

@@ -47,7 +47,9 @@ public class CreateApplicationService {
 
         CreateApplicationServiceResponse createApplicationServiceResponse;
 
-        if (eyeApplicationRepository.findByApplicationName(request.getApplicationName()) == null) {
+        List<EyeApplicationEntity> applicationEntities = eyeApplicationRepository.findByApplicationName(request.getApplicationName());
+
+        if (applicationEntities.isEmpty()) {
             EyeApplicationMapper eyeApplicationMapper = Mappers.getMapper(EyeApplicationMapper.class);
 
             EyeApplicationEntity savedEyeApplicationEntity = null;
@@ -77,7 +79,7 @@ public class CreateApplicationService {
             createApplicationServiceResponse = eyeApplicationMapper.eyeApplicationEntityToCreateApplicationServiceResponse(savedEyeApplicationEntity);
 
         } else {
-            throw new BirdException(ExceptionCategory.CONFLICT, "There is a conflict with the application name.");
+            throw new BirdException(ExceptionCategory.VALIDATION_ERROR, "Request not valid. Either the request is null or the Name for the application has a conflict..");
         }
 
         return createApplicationServiceResponse;
