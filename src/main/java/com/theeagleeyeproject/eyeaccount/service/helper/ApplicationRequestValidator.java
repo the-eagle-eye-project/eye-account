@@ -84,7 +84,7 @@ public class ApplicationRequestValidator implements BaseServiceValidator<CreateA
                 List<String> accountApplicationIds = accountEntity.get().getApplications();
 
                 // Compare both lists of application ids, if one matches, then return an exception to the requester.
-                if (!accountApplicationIds.isEmpty() && accountApplicationIds.stream().anyMatch(existingApplicationIds::contains)) {
+                if (accountApplicationIds != null && !accountApplicationIds.isEmpty() && accountApplicationIds.stream().anyMatch(existingApplicationIds::contains)) {
                     throw new BirdException(ExceptionCategory.CONFLICT,
                             "There is an application with the same name associated with account.");
                 }
@@ -103,12 +103,9 @@ public class ApplicationRequestValidator implements BaseServiceValidator<CreateA
      */
     private void validateJobConfiguration(List<JobConfiguration> jobConfigurations) {
 
-        // TODO: NEEDS TO BE TESTED
-        //      Needs to be moved to a BaseAccountValidator abstract class, so that it can be re-used when adding or editing jobs.
-
         // Verifies that the name of each job are not duplicate within the same application.
         boolean doesHaveRepeatedJobNames = jobConfigurations.stream()
-                .collect(Collectors.groupingBy(JobConfiguration::getJobName))
+                .collect(Collectors.groupingBy(JobConfiguration::getJobId))
                 .values()
                 .stream()
                 .anyMatch(numberOfNames -> numberOfNames.size() > 1);
@@ -129,34 +126,44 @@ public class ApplicationRequestValidator implements BaseServiceValidator<CreateA
      */
     private void validatePreProcessedJobs(List<JobConfiguration> jobConfigurations) {
         // Validate the pre-processed job ID is valid and exists within the Application's jobs.
-        List<String> jobNames = jobConfigurations.stream()
-                .map(JobConfiguration::getJobName)
+        List<String> jobIds = jobConfigurations.stream()
+                .map(JobConfiguration::getJobId)
                 .toList();
 
         for (JobConfiguration jobConfiguration : jobConfigurations) {
-            List<String> preProcessedJobs = jobConfiguration.getPreProcessedJobsName();
+            List<String> preProcessedJobIds = jobConfiguration.getPreProcessedJobIds();
 
-            // If Pre-processed jobs are found under the Job configuration, will then proceed with the  logic.
-            if (preProcessedJobs != null) {
-                for (String preProcessedJob : preProcessedJobs) {
+            compareAllPreProcessedJobs(preProcessedJobIds, jobIds);
+        }
+    }
 
-                    // Temp variable that holds the validation status
-                    boolean preProcessFound = false;
-                    // Iterates through all the Jobs configured under the same application.
-                    for (String jobName : jobNames) {
+    /**
+     * Do the comparison of all the processed jobs and return an exception if the comparison fails.
+     *
+     * @param preProcessedJobIds all the pre-processed jobs in a single Job.
+     * @param jobIds             the job that is going to be validated
+     */
+    private void compareAllPreProcessedJobs(List<String> preProcessedJobIds, List<String> jobIds) {
+        // If Pre-processed jobs are found under the Job configuration, will then proceed with the logic.
+        if (preProcessedJobIds != null) {
+            for (String preProcessedJobId : preProcessedJobIds) {
 
-                        // Compares the Pre-processed job name with all the Jobs configured under the application.
-                        // If a Pre-processed Job is found in the configured job list, then it will set the flag to true,
-                        // however, if it's not found, then it will  leave the flag as FALSE, then an exception will be thrown.
-                        if (preProcessedJob.equals(jobName)) {
-                            preProcessFound = true;
-                            break;
-                        }
+                // Temp variable that holds the validation status
+                boolean preProcessFound = false;
+                // Iterates through all the Jobs configured under the same application.
+                for (String jobId : jobIds) {
+
+                    // Compares the Pre-processed job name with all the Jobs configured under the application.
+                    // If a Pre-processed Job is found in the configured job list, then it will set the flag to true,
+                    // however, if it's not found, then it will  leave the flag as FALSE, then an exception will be thrown.
+                    if (preProcessedJobId.equals(jobId)) {
+                        preProcessFound = true;
+                        break;
                     }
-                    // Throws an exception when a Pre-Processed job is found, but it's orphan from the configured jobs. Therefore, no Jobs are found under the same name
-                    if (!preProcessFound) {
-                        throw new BirdException(ExceptionCategory.VALIDATION_ERROR, "One or more job/s in the pre processed list doesn't have a parent.");
-                    }
+                }
+                // Throws an exception when a Pre-Processed job is found, but it's orphan from the configured jobs. Therefore, no Jobs are found under the same name
+                if (!preProcessFound) {
+                    throw new BirdException(ExceptionCategory.VALIDATION_ERROR, "One or more job/s in the pre processed list doesn't have a parent.");
                 }
             }
         }

@@ -41,8 +41,8 @@ public class JobConfigurationEntity {
     /**
      * All the job Identifiers that needs to run before the current job can execute
      */
-    @Field(name = "pre_processed_jobs")
-    private List<String> preProcessedJobs;
+    @Field(name = "pre_processed_job_ids")
+    private List<String> preProcessedJobIds;
 
     /**
      * Expected transactions per second of the job

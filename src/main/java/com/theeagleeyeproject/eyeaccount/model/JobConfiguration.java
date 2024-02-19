@@ -18,7 +18,7 @@ public class JobConfiguration {
      * Name of the job. It shouldn't be repeated under the same application.
      */
     @NotNull
-    private String jobName;
+    private String jobId;
 
     /**
      * What kind of job is.
@@ -32,7 +32,7 @@ public class JobConfiguration {
      * If the Application's jobs should be monitored in a specific order, then each should
      * have the dependencies respective to the order.
      */
-    private List<String> preProcessedJobsName;
+    private List<String> preProcessedJobIds;
 
     /**
      * Transactions per second, that is expected by the job, otherwise it would create an alert.

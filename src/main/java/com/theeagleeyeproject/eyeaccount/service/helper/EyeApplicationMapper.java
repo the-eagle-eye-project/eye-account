@@ -31,7 +31,7 @@ public interface EyeApplicationMapper {
     CreateApplicationServiceResponse eyeApplicationEntityToCreateApplicationServiceResponse(EyeApplicationEntity entity);
 
 
-    @Mapping(target = "jobId", expression = "java(java.util.UUID.randomUUID().toString())")
+    //    @Mapping(target = "jobId", expression = "java(java.util.UUID.randomUUID().toString())")
     JobConfigurationEntity jobConfigurationToJobConfigurationEntity(JobConfiguration jobConfiguration);
 
     @Named("toJobConfigurationEntityList")

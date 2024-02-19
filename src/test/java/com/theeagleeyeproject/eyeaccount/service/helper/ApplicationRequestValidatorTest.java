@@ -56,16 +56,16 @@ class ApplicationRequestValidatorTest {
 
         // Mocks the Job Configurations
         JobConfiguration jobConfiguration1 = new JobConfiguration();
-        jobConfiguration1.setJobName("Job_1");
+        jobConfiguration1.setJobId("Job_1");
 
         JobConfiguration jobConfiguration2 = new JobConfiguration();
-        jobConfiguration2.setJobName("Job_2");
-        jobConfiguration2.setPreProcessedJobsName(List.of("Job_1"));
+        jobConfiguration2.setJobId("Job_2");
+        jobConfiguration2.setPreProcessedJobIds(List.of("Job_1"));
 
         JobConfiguration jobConfiguration3 = new JobConfiguration();
-        jobConfiguration3.setJobName("Job_3");
-        jobConfiguration3.setJobName("Job_3");
-        jobConfiguration3.setPreProcessedJobsName(List.of("Job_1", "Job_2"));
+        jobConfiguration3.setJobId("Job_3");
+        jobConfiguration3.setJobId("Job_3");
+        jobConfiguration3.setPreProcessedJobIds(List.of("Job_1", "Job_2"));
 
         List<JobConfiguration> jobConfigurations = new ArrayList<>(List.of(jobConfiguration1, jobConfiguration2, jobConfiguration3));
         applicationServiceRequest.setJobConfiguration(jobConfigurations);
@@ -121,15 +121,15 @@ class ApplicationRequestValidatorTest {
 
         // Mocks the Job Configurations
         JobConfiguration jobConfiguration1 = new JobConfiguration();
-        jobConfiguration1.setJobName("Job_1");
+        jobConfiguration1.setJobId("Job_1");
 
         JobConfiguration jobConfiguration2 = new JobConfiguration();
-        jobConfiguration2.setJobName("Job_2");
-        jobConfiguration2.setPreProcessedJobsName(List.of("Job_1"));
+        jobConfiguration2.setJobId("Job_2");
+        jobConfiguration2.setPreProcessedJobIds(List.of("Job_1"));
 
         JobConfiguration jobConfiguration3 = new JobConfiguration();
-        jobConfiguration3.setJobName("Job_3");
-        jobConfiguration3.setPreProcessedJobsName(List.of("Job_1", "Job_4"));
+        jobConfiguration3.setJobId("Job_3");
+        jobConfiguration3.setPreProcessedJobIds(List.of("Job_1", "Job_4"));
 
         List<JobConfiguration> jobConfigurations = new ArrayList<>(List.of(jobConfiguration1, jobConfiguration2, jobConfiguration3));
         applicationServiceRequest.setJobConfiguration(jobConfigurations);
